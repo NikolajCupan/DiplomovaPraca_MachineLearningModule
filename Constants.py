@@ -24,6 +24,7 @@ INPUT_P_VALUE_KEY = "p_value"
 INPUT_ACTION_KEY = "action"
 
 
+OUT_EXCEPTION_KEY = "exception"
 OUTPUT_SUCCESS_KEY = "success"
 OUTPUT_P_VALUE_KEY = "result_p_value"
 

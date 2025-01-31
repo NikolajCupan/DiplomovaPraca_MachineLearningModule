@@ -58,12 +58,14 @@ def executeAction(jsonFileName):
         timeSeries = getTimeSeries(inputJson[Constants.INPUT_FILE_NAME_KEY])
 
         if action == Constants.ACTION_DICKEY_FULLER_TEST:
-            success = Tests.dickeyFullerTest(timeSeries, outputJson)
+            success = Tests.dickeyFullerTest(timeSeries, inputJson, outputJson)
         else:
             success = False
 
     outputJson[Constants.OUTPUT_SUCCESS_KEY] = success
-    evaluatePValue(inputJson, outputJson)
+    if success:
+        evaluatePValue(inputJson, outputJson)
+
     outputJsonData = json.dumps(outputJson)
 
     with open(outputJsonFilePath, 'w') as outputFile:

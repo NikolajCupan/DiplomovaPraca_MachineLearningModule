@@ -1,10 +1,24 @@
 import Constants
 
+import json
 from statsmodels.tsa.stattools import adfuller
 
-def dickeyFullerTest(timeSeries, outputJson):
+def buildArguments(inputJson, pairs):
+    args = {}
+
+    for nameInJson, nameInFunction in pairs:
+        if nameInJson in inputJson:
+            if inputJson[nameInJson] == "None":
+                args[nameInFunction] = None
+            else:
+                args[nameInFunction] = inputJson[nameInJson]
+
+    return args
+
+def dickeyFullerTest(timeSeries, inputJson, outputJson):
     try:
-        result = adfuller(timeSeries.values)
+        args = (buildArguments(inputJson, [("maxLag", "maxlag"), ("regression", "regression"), ("autolag", "autolag")]))
+        result = adfuller(timeSeries.values, **args)
 
         outputJson["adf"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "testovacia štatistika",
@@ -35,7 +49,8 @@ def dickeyFullerTest(timeSeries, outputJson):
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: "časový rad je stacionárny"
         }
-    except:
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = str(exception)
         return False
 
     return True
