@@ -32,6 +32,11 @@ def evaluatePValue(inputJson, outputJson):
     if Constants.INPUT_P_VALUE_KEY in inputJson:
         inputPValue = float(inputJson[Constants.INPUT_P_VALUE_KEY])
 
+    outputJson[Constants.OUTPUT_USED_P_VALUE_KEY] = {
+        Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_USED_P_VALUE_TITLE_VALUE,
+        Constants.OUTPUT_ELEMENT_RESULT_KEY: inputPValue
+    }
+
     outputJson[Constants.OUTPUT_EVALUATION_KEY] = {
         Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EVALUATION_TITLE_VALUE,
         Constants.OUTPUT_ELEMENT_RESULT_KEY: ""
@@ -71,7 +76,17 @@ def executeAction(jsonFileName):
     with open(outputJsonFilePath, 'w') as outputFile:
         outputFile.write(outputJsonData)
 
+    print("============================================================ INPUT JSON ============================================================")
+    print(json.dumps(inputJson, ensure_ascii = False, indent = 4))
+    print("========================================================== INPUT JSON END ==========================================================")
+
+    print("\n=========================================================== OUTPUT JSON ============================================================")
+    print(json.dumps(outputJson, ensure_ascii = False, indent = 4))
+    print("========================================================== OUTPUT JSON END ==========================================================")
+
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding = 'utf-8')
+
     try:
         fileName = ""
         if len(sys.argv) > 1:
@@ -81,7 +96,8 @@ if __name__ == "__main__":
             print("\n\n===== DEBUG =====")
 
         executeAction(fileName)
-    except:
+    except Exception as exception:
+        print(exception)
         sys.exit(1)
 
     sys.exit(0)

@@ -50,7 +50,10 @@ def dickeyFullerTest(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: "časový rad je stacionárny"
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = str(exception)
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
         return False
 
     return True
