@@ -17,6 +17,7 @@ DATE_TIME_FORMAT = "%Y/%m/%d-%H"
 
 
 ACTION_DICKEY_FULLER_TEST = "dicker_fuller_test"
+ACTION_KPSS_TEST = "kpss_test"
 
 
 INPUT_FILE_NAME_KEY = "file_name"
@@ -29,12 +30,16 @@ OUT_EXCEPTION_TITLE_VALUE = "vzniknutá chyba"
 
 OUTPUT_SUCCESS_KEY = "success"
 OUTPUT_P_VALUE_KEY = "result_p_value"
+OUTPUT_P_VALUE_TITLE_VALUE = "výsledná p-hodnota"
 
 OUTPUT_USED_P_VALUE_KEY = "used_p_value"
 OUTPUT_USED_P_VALUE_TITLE_VALUE = "zvolená hladina významnosti"
 
 OUTPUT_EVALUATION_KEY = "evaluation"
 OUTPUT_EVALUATION_TITLE_VALUE = "vyhodnotenie"
+
+OUTPUT_TEST_STATISTIC_KEY = "test_statistics"
+OUTPUT_TEST_STATISTIC_TITLE_VALUE = "testovacia štatistika"
 
 OUTPUT_NULL_HYPOTHESIS_KEY = "null_hypothesis"
 OUTPUT_NULL_HYPOTHESIS_TITLE_VALUE = "nulová hypotéza"

@@ -1,31 +1,32 @@
 import Constants
 
-import json
 from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.stattools import kpss
 
-def buildArguments(inputJson, pairs):
+def buildArguments(inputJson, keys):
     args = {}
 
-    for nameInJson, nameInFunction in pairs:
-        if nameInJson in inputJson:
-            if inputJson[nameInJson] == "None":
-                args[nameInFunction] = None
+    for key in keys:
+        if key in inputJson:
+            if inputJson[key] == "None":
+                args[key] = None
             else:
-                args[nameInFunction] = inputJson[nameInJson]
+                args[key] = inputJson[key]
 
+    print(args)
     return args
 
 def dickeyFullerTest(timeSeries, inputJson, outputJson):
     try:
-        args = (buildArguments(inputJson, [("maxLag", "maxlag"), ("regression", "regression"), ("autolag", "autolag")]))
+        args = (buildArguments(inputJson, ["maxlag", "regression", "autolag"]))
         result = adfuller(timeSeries.values, **args)
 
-        outputJson["adf"] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: "testovacia štatistika",
+        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: result[0]
         }
         outputJson[Constants.OUTPUT_P_VALUE_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: "výsledná p-hodnota",
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_P_VALUE_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: result[1]
         }
         outputJson["used_lag"] = {
@@ -48,6 +49,45 @@ def dickeyFullerTest(timeSeries, inputJson, outputJson):
         outputJson[Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: "časový rad je stacionárny"
+        }
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
+
+def kpssTest(timeSeries, inputJson, outputJson):
+    try:
+        args = (buildArguments(inputJson, ["regression", "nlags"]))
+        result = kpss(timeSeries.values, **args)
+
+        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[0]
+        }
+        outputJson[Constants.OUTPUT_P_VALUE_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_P_VALUE_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[1]
+        }
+        outputJson["lags"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "počet použitých lagov",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[2]
+        }
+        outputJson["crit"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "kritické hodnoty",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[3]
+        }
+
+        outputJson[Constants.OUTPUT_NULL_HYPOTHESIS_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_NULL_HYPOTHESIS_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: "časový rad je trendovo stacionárny"
+        }
+        outputJson[Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: "časový rad nie je trendovo stacionárny"
         }
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {

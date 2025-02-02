@@ -64,6 +64,8 @@ def executeAction(jsonFileName):
 
         if action == Constants.ACTION_DICKEY_FULLER_TEST:
             success = Tests.dickeyFullerTest(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_KPSS_TEST:
+            success = Tests.kpssTest(timeSeries, inputJson, outputJson)
         else:
             success = False
 
