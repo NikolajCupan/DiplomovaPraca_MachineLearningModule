@@ -5,6 +5,7 @@ import pandas as pd
 
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.stattools import kpss
+from statsmodels.stats.diagnostic import het_arch
 from statsmodels.stats.diagnostic import acorr_ljungbox
 
 def buildArguments(inputJson, keys):
@@ -95,6 +96,45 @@ def kpssTest(timeSeries, inputJson, outputJson):
         outputJson[Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: "časový rad nie je trendovo stacionárny"
+        }
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
+
+def archTest(timeSeries, inputJson, outputJson):
+    try:
+        args = (buildArguments(inputJson, ["nlags", "ddof"]))
+        result = het_arch(timeSeries.values, **args)
+
+        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[0]
+        }
+        outputJson[Constants.OUTPUT_P_VALUE_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_P_VALUE_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[1]
+        }
+        outputJson["fval"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "testovacia štatistika F testu",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[2]
+        }
+        outputJson["fpval"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "p-hodnota F testu",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[3]
+        }
+
+        outputJson[Constants.OUTPUT_NULL_HYPOTHESIS_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_NULL_HYPOTHESIS_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: "reziduá nevykazujú známky heteroskedasticity"
+        }
+        outputJson[Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: "reziduá vykazujú známky heteroskedasticity"
         }
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
