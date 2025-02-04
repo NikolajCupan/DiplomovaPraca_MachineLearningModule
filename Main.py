@@ -66,6 +66,8 @@ def executeAction(jsonFileName):
             success = Tests.dickeyFullerTest(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_KPSS_TEST:
             success = Tests.kpssTest(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_LJUNG_BOX_TEST:
+            success = Tests.ljungBoxTest(timeSeries, inputJson, outputJson)
         else:
             success = False
 
@@ -78,7 +80,7 @@ def executeAction(jsonFileName):
     with open(outputJsonFilePath, 'w') as outputFile:
         outputFile.write(outputJsonData)
 
-    print("============================================================ INPUT JSON ============================================================")
+    print("\n============================================================ INPUT JSON ============================================================")
     print(json.dumps(inputJson, ensure_ascii = False, indent = 4))
     print("========================================================== INPUT JSON END ==========================================================")
 
@@ -95,7 +97,6 @@ if __name__ == "__main__":
             fileName = sys.argv[1]
         else:
             fileName = "debug.json"
-            print("\n\n===== DEBUG =====")
 
         executeAction(fileName)
     except Exception as exception:
