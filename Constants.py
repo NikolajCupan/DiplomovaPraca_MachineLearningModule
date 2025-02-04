@@ -41,7 +41,7 @@ OUTPUT_EVALUATION_KEY = "evaluation"
 OUTPUT_EVALUATION_TITLE_VALUE = "vyhodnotenie"
 
 OUTPUT_TEST_STATISTIC_KEY = "test_statistics"
-OUTPUT_TEST_STATISTIC_TITLE_VALUE = "testovacia štatistika"
+OUTPUT_TEST_STATISTIC_TITLE_VALUE = "vypočítaná testovacia štatistika"
 
 OUTPUT_NULL_HYPOTHESIS_KEY = "null_hypothesis"
 OUTPUT_NULL_HYPOTHESIS_TITLE_VALUE = "nulová hypotéza"

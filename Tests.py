@@ -29,14 +29,15 @@ def dickeyFullerTest(timeSeries, inputJson, outputJson):
         args = (buildArguments(inputJson, ["maxlag", "regression", "autolag"]))
         result = adfuller(timeSeries.values, **args)
 
-        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[0]
-        }
         outputJson[Constants.OUTPUT_P_VALUE_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_P_VALUE_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: result[1]
         }
+        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[0]
+        }
+
         outputJson["used_lag"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "počet použitých lagov",
             Constants.OUTPUT_ELEMENT_RESULT_KEY: result[2]
@@ -72,14 +73,15 @@ def kpssTest(timeSeries, inputJson, outputJson):
         args = (buildArguments(inputJson, ["regression", "nlags"]))
         result = kpss(timeSeries.values, **args)
 
-        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[0]
-        }
         outputJson[Constants.OUTPUT_P_VALUE_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_P_VALUE_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: result[1]
         }
+        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[0]
+        }
+
         outputJson["lags"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "počet použitých lagov",
             Constants.OUTPUT_ELEMENT_RESULT_KEY: result[2]
@@ -111,14 +113,15 @@ def archTest(timeSeries, inputJson, outputJson):
         args = (buildArguments(inputJson, ["nlags", "ddof"]))
         result = het_arch(timeSeries.values, **args)
 
-        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[0]
-        }
         outputJson[Constants.OUTPUT_P_VALUE_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_P_VALUE_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: result[1]
         }
+        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result[0]
+        }
+
         outputJson["fval"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "testovacia štatistika F testu",
             Constants.OUTPUT_ELEMENT_RESULT_KEY: result[2]
@@ -155,14 +158,15 @@ def ljungBoxTest(timeSeries, inputJson, outputJson):
         else:
             outputPValue = result.iloc[-1]['lb_pvalue']
 
-        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: result.iloc[-1]['lb_stat']
-        }
         outputJson[Constants.OUTPUT_P_VALUE_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_P_VALUE_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: outputPValue
         }
+        outputJson[Constants.OUTPUT_TEST_STATISTIC_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TEST_STATISTIC_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: result.iloc[-1]['lb_stat']
+        }
+
         outputJson["lags_used"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "počet použitých lagov",
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(result.index[-1])
