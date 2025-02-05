@@ -6,6 +6,43 @@ import json
 import os
 import pandas as pd
 
+def formatJson(pJson):
+    jsonData = json.dumps(pJson, ensure_ascii = False, indent = 4)
+    formattedJsonData = ""
+
+    inString = False
+    inArray = False
+    escape = False
+
+    for i in range(len(jsonData)):
+        char = jsonData[i]
+        appendedChar = char
+
+        if inString:
+            if escape:
+                escape = False
+            elif char == '\\':
+                escape = True
+            elif char == '\"':
+                inString = False
+        else:
+            if char == '\"':
+                inString = True
+            elif char == '[':
+                inArray = True
+            elif char == ']':
+                inArray = False
+            elif char == '\n' and inArray:
+                appendedChar = ''
+            elif char == ' ' and inArray:
+                appendedChar = ''
+            elif char == ',' and inArray:
+                appendedChar = ", "
+
+        formattedJsonData += appendedChar
+
+    return formattedJsonData
+
 def getFullInputPath(pJsonFileName):
     return os.path.join(Constants.PYTHON_BASE_DIRECTORY, Constants.BACKEND_BASE_DIRECTORY_PATH, Constants.DATASET_INPUT_PATH, pJsonFileName)
 
@@ -88,11 +125,11 @@ def executeAction(jsonFileName):
         outputFile.write(outputJsonData)
 
     print("\n============================================================ INPUT JSON ============================================================")
-    print(json.dumps(inputJson, ensure_ascii = False, indent = 4))
+    print(formatJson(inputJson))
     print("========================================================== INPUT JSON END ==========================================================")
 
     print("\n=========================================================== OUTPUT JSON ============================================================")
-    print(json.dumps(outputJson, ensure_ascii = False, indent = 4))
+    print(formatJson(outputJson))
     print("========================================================== OUTPUT JSON END ==========================================================")
 
 if __name__ == "__main__":
