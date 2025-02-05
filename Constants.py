@@ -18,6 +18,8 @@ DATE_TIME_FORMAT = "%Y/%m/%d-%H"
 
 ACTION_DICKEY_FULLER_TEST = "dicker_fuller_test"
 ACTION_KPSS_TEST = "kpss_test"
+ACTION_SEASONAL_DECOMPOSE = "seasonal_decompose"
+ACTION_PERIODOGRAM = "periodogram"
 ACTION_ARCH_TEST = "arch_test"
 ACTION_LJUNG_BOX_TEST = "ljung_box_test"
 

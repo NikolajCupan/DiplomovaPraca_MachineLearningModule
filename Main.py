@@ -61,11 +61,16 @@ def executeAction(jsonFileName):
         inputJson = json.load(inputFile)
         action = inputJson[Constants.INPUT_ACTION_KEY]
         timeSeries = getTimeSeries(inputJson[Constants.INPUT_FILE_NAME_KEY])
+        timeSeries.dropna(inplace = True)
 
         if action == Constants.ACTION_DICKEY_FULLER_TEST:
             success = Tests.dickeyFullerTest(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_KPSS_TEST:
             success = Tests.kpssTest(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_SEASONAL_DECOMPOSE:
+            success = Tests.seasonalDecompose(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_PERIODOGRAM:
+            success = Tests.periodogram(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_ARCH_TEST:
             success = Tests.archTest(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_LJUNG_BOX_TEST:

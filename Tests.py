@@ -2,11 +2,19 @@ import Constants
 
 import json
 import pandas as pd
+import numpy as np
 
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.stattools import kpss
+from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.stats.diagnostic import het_arch
 from statsmodels.stats.diagnostic import acorr_ljungbox
+
+from scipy.signal import periodogram as scipy_periodogram
+
+def convertToJsonArray(array):
+    listArray = array.tolist()
+    return [None if np.isnan(x) else x for x in listArray]
 
 def buildArguments(inputJson, keys):
     args = {}
@@ -98,6 +106,57 @@ def kpssTest(timeSeries, inputJson, outputJson):
         outputJson[Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: "časový rad nie je trendovo stacionárny"
+        }
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
+
+def seasonalDecompose(timeSeries, inputJson, outputJson):
+    try:
+        args = (buildArguments(inputJson, ["model", "period"]))
+        result = seasonal_decompose(timeSeries.values, **args)
+
+        outputJson["observed"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "pozorované hodnoty",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(result.observed)
+        }
+        outputJson["trend"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "trend",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(result.trend)
+        }
+        outputJson["seasonal"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "sezónna zložka",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(result.seasonal)
+        }
+        outputJson["resid"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "reziduá",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(result.resid)
+        }
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
+
+def periodogram(timeSeries, inputJson, outputJson):
+    try:
+        frequencies, power = scipy_periodogram(timeSeries.values)
+
+        outputJson["frequency"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "frekvencia",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(frequencies)
+        }
+        outputJson["power"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "sila",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(power)
         }
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
