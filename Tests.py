@@ -148,15 +148,29 @@ def seasonalDecompose(timeSeries, inputJson, outputJson):
 
 def periodogram(timeSeries, inputJson, outputJson):
     try:
-        frequencies, power = scipy_periodogram(timeSeries.values)
+        timeSeries = timeSeries.diff().dropna()
+        frequency, power = scipy_periodogram(timeSeries.values)
 
-        outputJson["frequency"] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: "frekvencia",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(frequencies)
-        }
+        frequency, power = np.array(frequency[1:]), np.array(power[1:])
+
+        period = 1 / frequency
+        period = period[::-1]
+
         outputJson["power"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "sila",
             Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(power)
+        }
+        outputJson["reversed_power"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "sila",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(power[::-1])
+        }
+        outputJson["frequency"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "frekvencia",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(frequency)
+        }
+        outputJson["period"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "perióda",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(period)
         }
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {

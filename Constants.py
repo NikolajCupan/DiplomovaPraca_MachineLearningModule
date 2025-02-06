@@ -5,7 +5,7 @@ DEBUG_FILE_NAME = "debug.json"
 
 PYTHON_BASE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 
-BACKEND_BASE_DIRECTORY_PATH = "backend"
+BACKEND_BASE_DIRECTORY_PATH = "java_backend"
 
 DATASET_TIME_SERIES_PATH = "storage\\dataset"
 DATASET_INPUT_PATH = "storage\\python\\input"
