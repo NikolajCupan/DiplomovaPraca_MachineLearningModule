@@ -148,11 +148,10 @@ def seasonalDecompose(timeSeries, inputJson, outputJson):
 
 def periodogram(timeSeries, inputJson, outputJson):
     try:
-        timeSeries = timeSeries.diff().dropna()
-        frequency, power = scipy_periodogram(timeSeries.values)
+        args = (buildArguments(inputJson, ["fs", "nfft", "spectrum", "scaling"]))
+        frequency, power = scipy_periodogram(timeSeries.values, args)
 
         frequency, power = np.array(frequency[1:]), np.array(power[1:])
-
         period = 1 / frequency
         period = period[::-1]
 
