@@ -148,8 +148,8 @@ def seasonalDecompose(timeSeries, inputJson, outputJson):
 
 def periodogram(timeSeries, inputJson, outputJson):
     try:
-        args = (buildArguments(inputJson, ["fs", "nfft", "spectrum", "scaling"]))
-        frequency, power = scipy_periodogram(timeSeries.values, args)
+        args = (buildArguments(inputJson, ["fs", "nfft", "return_onesided", "scaling"]))
+        frequency, power = scipy_periodogram(timeSeries.values, **args)
 
         frequency, power = np.array(frequency[1:]), np.array(power[1:])
         period = 1 / frequency
@@ -170,6 +170,40 @@ def periodogram(timeSeries, inputJson, outputJson):
         outputJson["period"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "perióda",
             Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(period)
+        }
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
+
+def correlogramAcf(timeSeries, inputJson, outputJson):
+    try:
+        args = (buildArguments(inputJson, ["adjusted", "nlags", "fft", "alpha", "bartlett_confint"]))
+
+        outputJson["acf_test"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "acf_test",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: "acf_test"
+        }
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
+
+def correlogramPacf(timeSeries, inputJson, outputJson):
+    try:
+        args = (buildArguments(inputJson, ["nlags", "method", "alpha"]))
+
+        outputJson["pacf_test"] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "pacf_test",
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: "pacf_test"
         }
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {

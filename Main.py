@@ -108,6 +108,10 @@ def executeAction(jsonFileName):
             success = Tests.seasonalDecompose(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_PERIODOGRAM:
             success = Tests.periodogram(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_CORRELOGRAM_ACF:
+            success = Tests.correlogramAcf(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_CORRELOGRAM_PACF:
+            success = Tests.correlogramPacf(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_ARCH_TEST:
             success = Tests.archTest(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_LJUNG_BOX_TEST:
