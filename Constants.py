@@ -53,6 +53,8 @@ OUTPUT_NULL_HYPOTHESIS_TITLE_VALUE = "nulová hypotéza"
 OUTPUT_ALTERNATIVE_HYPOTHESIS_KEY = "alternative_hypothesis"
 OUTPUT_ALTERNATIVE_HYPOTHESIS_TITLE_VALUE = "alternatívna hypotéza"
 
+OUTPUT_CONFIDENCE_INTERVAL_UPPER_BOUND_KEY = "confidence_interval_upper_bound"
+OUTPUT_CONFIDENCE_INTERVAL_LOWER_BOUND_KEY = "confidence_interval_lower_bound"
 
 OUTPUT_ELEMENT_TITLE_KEY = "title"
 OUTPUT_ELEMENT_RESULT_KEY = "result"
