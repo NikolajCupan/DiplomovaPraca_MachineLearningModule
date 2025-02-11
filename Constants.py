@@ -1,6 +1,7 @@
 import os
 
 DEBUG_FILE_NAME = "debug.json"
+DEBUG = False
 
 
 PYTHON_BASE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))

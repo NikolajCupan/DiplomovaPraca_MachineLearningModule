@@ -1,4 +1,5 @@
 import Constants
+import Debug
 import Tests
 
 import sys
@@ -137,6 +138,10 @@ def executeAction(jsonFileName):
     print("========================================================== OUTPUT JSON END ==========================================================")
 
 if __name__ == "__main__":
+    if Constants.DEBUG:
+        Debug.debug()
+        sys.exit(0)
+
     sys.stdout.reconfigure(encoding = 'utf-8')
 
     try:
