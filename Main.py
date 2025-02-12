@@ -1,10 +1,12 @@
 import Constants
 import Debug
+import Helper
 import Tests
+import Transformations
 
 import sys
 import json
-import os
+
 import pandas as pd
 
 def formatJson(pJson):
@@ -44,21 +46,17 @@ def formatJson(pJson):
 
     return formattedJsonData
 
-def getFullInputPath(pJsonFileName):
-    return os.path.join(Constants.PYTHON_BASE_DIRECTORY, Constants.BACKEND_BASE_DIRECTORY_PATH, Constants.DATASET_INPUT_PATH, pJsonFileName)
-
-def getFullOutputPath(pJsonFileName):
-    return os.path.join(Constants.PYTHON_BASE_DIRECTORY, Constants.BACKEND_BASE_DIRECTORY_PATH, Constants.DATASET_OUTPUT_PATH, pJsonFileName)
-
-def getFullTimeSeriesPath(pDatasetFileName):
-    return os.path.join(Constants.PYTHON_BASE_DIRECTORY, Constants.BACKEND_BASE_DIRECTORY_PATH, Constants.DATASET_TIME_SERIES_PATH, pDatasetFileName)
-
 def getTimeSeries(datasetFileName):
-    timeSeriesPath = getFullTimeSeriesPath(datasetFileName + ".csv")
+    timeSeriesPath = Helper.getFullTimeSeriesPath(datasetFileName + ".csv")
     dataset = pd.read_csv(str(timeSeriesPath), header = None, names = [Constants.DATE_COLUMN_NAME, Constants.DATA_COLUMN_NAME])
-    dataset[Constants.DATE_COLUMN_NAME] = pd.to_datetime(dataset[Constants.DATE_COLUMN_NAME], format = Constants.DATE_TIME_FORMAT)
+    dataset[Constants.DATE_COLUMN_NAME] = pd.to_datetime(dataset[Constants.DATE_COLUMN_NAME], format = Constants.DATE_TIME_FORMAT, errors = "coerce")
 
-    return pd.Series(dataset[Constants.DATA_COLUMN_NAME].values, index = dataset[Constants.DATE_COLUMN_NAME])
+    timeSeries = pd.Series(dataset[Constants.DATA_COLUMN_NAME].values, index=dataset[Constants.DATE_COLUMN_NAME])
+    timeSeries = timeSeries.dropna()
+    timeSeries = timeSeries[timeSeries != "-"]
+    timeSeries = pd.to_numeric(timeSeries, errors = "coerce").dropna()
+
+    return timeSeries
 
 def evaluatePValue(inputJson, outputJson):
     inputPValue = -1
@@ -90,8 +88,8 @@ def evaluatePValue(inputJson, outputJson):
         outputJson[Constants.OUTPUT_EVALUATION_KEY][Constants.OUTPUT_ELEMENT_RESULT_KEY] = "p-hodnota je rovná ale vyššia ako hladina významnosti, nezamietame nulovú hypotézu"
 
 def executeAction(jsonFileName):
-    inputJsonFilePath = getFullInputPath(jsonFileName)
-    outputJsonFilePath = getFullOutputPath(jsonFileName)
+    inputJsonFilePath = Helper.getFullInputPath(jsonFileName)
+    outputJsonFilePath = Helper.getFullOutputPath(jsonFileName)
 
     outputJson = {}
 
@@ -99,7 +97,6 @@ def executeAction(jsonFileName):
         inputJson = json.load(inputFile)
         action = inputJson[Constants.INPUT_ACTION_KEY]
         timeSeries = getTimeSeries(inputJson[Constants.INPUT_FILE_NAME_KEY])
-        timeSeries.dropna(inplace = True)
 
         if action == Constants.ACTION_DICKEY_FULLER_TEST:
             success = Tests.dickeyFullerTest(timeSeries, inputJson, outputJson)
@@ -117,6 +114,14 @@ def executeAction(jsonFileName):
             success = Tests.archTest(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_LJUNG_BOX_TEST:
             success = Tests.ljungBoxTest(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_DIFFERENCE:
+            success = Transformations.difference(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_LOGARITHM:
+            success = Transformations.logarithm(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_NORMALIZATION:
+            success = Transformations.normalization(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_STANDARDIZATION:
+            success = Transformations.standardization(timeSeries, inputJson, outputJson)
         else:
             success = False
 
@@ -139,7 +144,7 @@ def executeAction(jsonFileName):
 
 if __name__ == "__main__":
     if Constants.DEBUG:
-        Debug.debug()
+        Debug.debug3()
         sys.exit(0)
 
     sys.stdout.reconfigure(encoding = 'utf-8')

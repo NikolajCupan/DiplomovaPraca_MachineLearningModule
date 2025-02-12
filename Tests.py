@@ -1,6 +1,6 @@
 import Constants
+import Helper
 
-import json
 import pandas as pd
 import numpy as np
 
@@ -14,29 +14,9 @@ from statsmodels.stats.diagnostic import acorr_ljungbox
 
 from scipy.signal import periodogram as scipy_periodogram
 
-def convertToJsonArray(array):
-    listArray = array.tolist()
-    return [None if np.isnan(x) else x for x in listArray]
-
-def buildArguments(inputJson, keys):
-    args = {}
-
-    for key in keys:
-        if key in inputJson:
-            if inputJson[key] == "None":
-                args[key] = None
-            else:
-                args[key] = inputJson[key]
-
-    print("\n=============================================================== ARGS ===============================================================")
-    print(json.dumps(args, ensure_ascii = False, indent = 4))
-    print("============================================================= ARGS END =============================================================")
-
-    return args
-
 def dickeyFullerTest(timeSeries, inputJson, outputJson):
     try:
-        args = buildArguments(inputJson, ["maxlag", "regression", "autolag"])
+        args = Helper.buildArguments(inputJson, ["maxlag", "regression", "autolag"])
         result = adfuller(timeSeries.values, **args)
 
         outputJson[Constants.OUTPUT_P_VALUE_KEY] = {
@@ -80,7 +60,7 @@ def dickeyFullerTest(timeSeries, inputJson, outputJson):
 
 def kpssTest(timeSeries, inputJson, outputJson):
     try:
-        args = buildArguments(inputJson, ["regression", "nlags"])
+        args = Helper.buildArguments(inputJson, ["regression", "nlags"])
         result = kpss(timeSeries.values, **args)
 
         outputJson[Constants.OUTPUT_P_VALUE_KEY] = {
@@ -120,24 +100,24 @@ def kpssTest(timeSeries, inputJson, outputJson):
 
 def seasonalDecompose(timeSeries, inputJson, outputJson):
     try:
-        args = buildArguments(inputJson, ["model", "period"])
+        args = Helper.buildArguments(inputJson, ["model", "period"])
         result = seasonal_decompose(timeSeries.values, **args)
 
         outputJson["observed"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "pozorované hodnoty",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(result.observed)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(result.observed)
         }
         outputJson["trend"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "trend",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(result.trend)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(result.trend)
         }
         outputJson["seasonal"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "sezónna zložka",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(result.seasonal)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(result.seasonal)
         }
         outputJson["resid"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "reziduá",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(result.resid)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(result.resid)
         }
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
@@ -150,7 +130,7 @@ def seasonalDecompose(timeSeries, inputJson, outputJson):
 
 def periodogram(timeSeries, inputJson, outputJson):
     try:
-        args = buildArguments(inputJson, ["fs", "nfft", "return_onesided", "scaling"])
+        args = Helper.buildArguments(inputJson, ["fs", "nfft", "return_onesided", "scaling"])
         frequency, power = scipy_periodogram(timeSeries.values, **args)
 
         frequency, power = np.array(frequency[1:]), np.array(power[1:])
@@ -159,19 +139,19 @@ def periodogram(timeSeries, inputJson, outputJson):
 
         outputJson["power"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "sila",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(power)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(power)
         }
         outputJson["reversed_power"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "sila",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(power[::-1])
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(power[::-1])
         }
         outputJson["frequency"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "frekvencia",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(frequency)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(frequency)
         }
         outputJson["period"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "perióda",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(period)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(period)
         }
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
@@ -184,21 +164,21 @@ def periodogram(timeSeries, inputJson, outputJson):
 
 def correlogramAcf(timeSeries, inputJson, outputJson):
     try:
-        args = buildArguments(inputJson, ["adjusted", "nlags", "fft", "alpha", "bartlett_confint"])
+        args = Helper.buildArguments(inputJson, ["adjusted", "nlags", "fft", "alpha", "bartlett_confint"])
         acfResult, confintResult = acf(timeSeries.values, **args)
         confintResultLowerBound, confintResultUpperBound = confintResult[:, 0], confintResult[:, 1]
 
         outputJson["acf_values"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "hodnoty acf",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(acfResult)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(acfResult)
         }
         outputJson[Constants.OUTPUT_CONFIDENCE_INTERVAL_UPPER_BOUND_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "interval spoľahlivosti horné ohraničenie",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(confintResultUpperBound)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(confintResultUpperBound)
         }
         outputJson[Constants.OUTPUT_CONFIDENCE_INTERVAL_LOWER_BOUND_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "interval spoľahlivosti dolné ohraničenie",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(confintResultLowerBound)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(confintResultLowerBound)
         }
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
@@ -211,21 +191,21 @@ def correlogramAcf(timeSeries, inputJson, outputJson):
 
 def correlogramPacf(timeSeries, inputJson, outputJson):
     try:
-        args = buildArguments(inputJson, ["nlags", "method", "alpha"])
+        args = Helper.buildArguments(inputJson, ["nlags", "method", "alpha"])
         pacfResult, confintResult = pacf(timeSeries.values, **args)
         confintResultLowerBound, confintResultUpperBound = confintResult[:, 0], confintResult[:, 1]
 
         outputJson["pacf_values"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "hodnoty pacf",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(pacfResult)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(pacfResult)
         }
         outputJson[Constants.OUTPUT_CONFIDENCE_INTERVAL_UPPER_BOUND_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "interval spoľahlivosti horné ohraničenie",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(confintResultUpperBound)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(confintResultUpperBound)
         }
         outputJson[Constants.OUTPUT_CONFIDENCE_INTERVAL_LOWER_BOUND_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "interval spoľahlivosti dolné ohraničenie",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: convertToJsonArray(confintResultLowerBound)
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(confintResultLowerBound)
         }
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
@@ -238,7 +218,7 @@ def correlogramPacf(timeSeries, inputJson, outputJson):
 
 def archTest(timeSeries, inputJson, outputJson):
     try:
-        args = buildArguments(inputJson, ["nlags", "ddof"])
+        args = Helper.buildArguments(inputJson, ["nlags", "ddof"])
         result = het_arch(timeSeries.values, **args)
 
         outputJson[Constants.OUTPUT_P_VALUE_KEY] = {
@@ -278,7 +258,7 @@ def archTest(timeSeries, inputJson, outputJson):
 
 def ljungBoxTest(timeSeries, inputJson, outputJson):
     try:
-        args = buildArguments(inputJson, ["period", "lags", "auto_lag", "model_df"])
+        args = Helper.buildArguments(inputJson, ["period", "lags", "auto_lag", "model_df"])
         result = acorr_ljungbox(timeSeries.values, **args)
 
         if pd.isna(result.iloc[-1]['lb_pvalue']):
