@@ -3,6 +3,7 @@ import Helper
 
 import csv
 
+import numpy as np
 import pandas as pd
 
 def saveToFile(timeSeries):
@@ -16,6 +17,17 @@ def saveToFile(timeSeries):
             writer.writerow([Helper.formatDate(date), data])
 
     return fullOutputPath
+
+def processResult(timeSeries, args):
+    timeSeriesStart = timeSeries.index.min()
+    timeSeriesEnd = timeSeries.index.max()
+    timeSeriesFrequency = args[Constants.FREQUENCY_TYPE_KEY]
+
+    fullDatesRange = pd.date_range(start = timeSeriesStart, end = timeSeriesEnd, freq = timeSeriesFrequency)
+    timeSeries = timeSeries.reindex(fullDatesRange, fill_value = "-")
+
+    fileName = saveToFile(timeSeries)
+    return fileName, timeSeriesStart
 
 def difference(timeSeries, inputJson, outputJson):
     try:
@@ -36,15 +48,7 @@ def difference(timeSeries, inputJson, outputJson):
             timeSeriesDifference = timeSeriesDifference.diff()
             timeSeriesDifference.dropna(inplace = True)
 
-        timeSeriesDifferenceStart = timeSeriesDifference.index.min()
-        timeSeriesDifferenceEnd = timeSeriesDifference.index.max()
-        timeSeriesDifferenceFrequency = args[Constants.FREQUENCY_TYPE_KEY]
-
-        fullDatesRange = pd.date_range(start = timeSeriesDifferenceStart, end = timeSeriesDifferenceEnd, freq = timeSeriesDifferenceFrequency)
-        timeSeriesDifference = timeSeriesDifference.reindex(fullDatesRange, fill_value = "-")
-
-        fileName = saveToFile(timeSeriesDifference)
-
+        fileName, timeSeriesDifferenceStart = processResult(timeSeriesDifference, args)
         outputJson[Constants.OUTPUT_TRANSFORMED_FILE_NAME_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TRANSFORMED_FILE_NAME_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: fileName
@@ -63,7 +67,39 @@ def difference(timeSeries, inputJson, outputJson):
     return True
 
 def logarithm(timeSeries, inputJson, outputJson):
-    return
+    try:
+        args = Helper.buildArguments(inputJson, ["use_natural_log", "base", Constants.FREQUENCY_TYPE_KEY])
+
+        if (timeSeries <= 0).any():
+            outputJson[Constants.OUT_EXCEPTION_KEY] = {
+                Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+                Constants.OUTPUT_ELEMENT_RESULT_KEY: "Dataset obsahuje záporné hodnoty"
+            }
+            return False
+
+        if "base" in args:
+            baseValue = args["base"]
+            timeSeries = np.log(timeSeries) / np.log(baseValue)
+        else:
+            timeSeries = np.log(timeSeries)
+
+        fileName, timeSeriesStart = processResult(timeSeries, args)
+        outputJson[Constants.OUTPUT_TRANSFORMED_FILE_NAME_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TRANSFORMED_FILE_NAME_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: fileName
+        }
+        outputJson[Constants.OUTPUT_START_DATE_TIME_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_START_DATE_TIME_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.formatDate(timeSeriesStart)
+        }
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
 
 def normalization(timeSeries, inputJson, outputJson):
     return
