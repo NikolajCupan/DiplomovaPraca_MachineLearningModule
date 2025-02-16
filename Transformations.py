@@ -136,4 +136,35 @@ def normalization(timeSeries, inputJson, outputJson):
     return True
 
 def standardization(timeSeries, inputJson, outputJson):
-    return
+    def standardize(value, pTimeSeriesMean, pTimeSeriesStandardDeviation, pMean, pStandardDeviation):
+        return (value - pTimeSeriesMean) / pTimeSeriesStandardDeviation * pStandardDeviation + pMean
+
+    try:
+        args = Helper.buildArguments(inputJson, ["mean", "standard_deviation", Constants.FREQUENCY_TYPE_KEY])
+
+        timeSeriesMean = np.mean(timeSeries)
+        timeSeriesStandardDeviation = np.std(timeSeries)
+
+        timeSeriesStandardized = [
+            standardize(element, timeSeriesMean, timeSeriesStandardDeviation, args["mean"], args["standard_deviation"])
+            for element in timeSeries
+        ]
+        timeSeriesStandardized = pd.Series(timeSeriesStandardized, index = timeSeries.index)
+
+        fileName, timeSeriesStart = processResult(timeSeriesStandardized, args)
+        outputJson[Constants.OUTPUT_TRANSFORMED_FILE_NAME_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TRANSFORMED_FILE_NAME_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: fileName
+        }
+        outputJson[Constants.OUTPUT_START_DATE_TIME_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_START_DATE_TIME_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.formatDate(timeSeriesStart)
+        }
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
