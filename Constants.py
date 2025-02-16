@@ -33,6 +33,8 @@ ACTION_LOGARITHM = "logarithm"
 ACTION_NORMALIZATION = "normalization"
 ACTION_STANDARDIZATION = "standardization"
 
+ACTION_ARIMA = "arima"
+
 
 INPUT_FILE_NAME_KEY = "file_name"
 INPUT_P_VALUE_KEY = "p_value"
@@ -49,7 +51,8 @@ OUT_EXCEPTION_KEY = "exception"
 OUT_EXCEPTION_TITLE_VALUE = "vzniknutá chyba"
 
 
-FREQUENCY_TYPE_KEY = "python_frequency"
+PYTHON_FREQUENCY_TYPE_KEY = "python_frequency"
+FREQUENCY_TYPE_KEY = "frequency"
 
 
 OUTPUT_TRANSFORMED_FILE_NAME_KEY = "transformed_file_name"
@@ -79,3 +82,15 @@ OUTPUT_ALTERNATIVE_HYPOTHESIS_TITLE_VALUE = "alternatívna hypotéza"
 
 OUTPUT_CONFIDENCE_INTERVAL_UPPER_BOUND_KEY = "confidence_interval_upper_bound"
 OUTPUT_CONFIDENCE_INTERVAL_LOWER_BOUND_KEY = "confidence_interval_lower_bound"
+
+
+OUTPUT_SUMMARY_KEY = "summary"
+
+OUTPUT_TRAIN_KEY = "train"
+OUTPUT_TEST_KEY = "test"
+
+MODEL_DATE_KEY = "date"
+MODEL_REAL_KEY = "real"
+MODEL_FITTED_KEY = "fitted"
+MODEL_RESIDUALS_KEY = "residuals"
+MODEL_FORECAST_KEY = "forecast"

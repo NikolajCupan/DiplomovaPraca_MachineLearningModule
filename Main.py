@@ -1,6 +1,8 @@
 import Constants
 import Debug
 import Helper
+
+import Models
 import Tests
 import Transformations
 
@@ -98,6 +100,8 @@ def executeAction(jsonFileName):
         action = inputJson[Constants.INPUT_ACTION_KEY]
         timeSeries = getTimeSeries(inputJson[Constants.INPUT_FILE_NAME_KEY])
 
+        #
+        # Tests
         if action == Constants.ACTION_DICKEY_FULLER_TEST:
             success = Tests.dickeyFullerTest(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_KPSS_TEST:
@@ -114,6 +118,10 @@ def executeAction(jsonFileName):
             success = Tests.archTest(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_LJUNG_BOX_TEST:
             success = Tests.ljungBoxTest(timeSeries, inputJson, outputJson)
+        # Tests end
+        #
+        #
+        # Transformations
         elif action == Constants.ACTION_DIFFERENCE:
             success = Transformations.difference(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_LOGARITHM:
@@ -122,8 +130,20 @@ def executeAction(jsonFileName):
             success = Transformations.normalization(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_STANDARDIZATION:
             success = Transformations.standardization(timeSeries, inputJson, outputJson)
+        # Transformations end
+        #
+        #
+        # Models
+        elif action == Constants.ACTION_ARIMA:
+            success = Models.arima(timeSeries, inputJson, outputJson)
+        # Models End
+        #
+        #
+        # Other
         else:
             success = False
+        # Other end
+        #
 
     outputJson[Constants.OUTPUT_SUCCESS_KEY] = success
     if success:

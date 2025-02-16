@@ -21,7 +21,7 @@ def saveToFile(timeSeries):
 def processResult(timeSeries, args):
     timeSeriesStart = timeSeries.index.min()
     timeSeriesEnd = timeSeries.index.max()
-    timeSeriesFrequency = args[Constants.FREQUENCY_TYPE_KEY]
+    timeSeriesFrequency = args[Constants.PYTHON_FREQUENCY_TYPE_KEY]
 
     fullDatesRange = pd.date_range(start = timeSeriesStart, end = timeSeriesEnd, freq = timeSeriesFrequency)
     timeSeries = timeSeries.reindex(fullDatesRange, fill_value = "-")
@@ -31,7 +31,7 @@ def processResult(timeSeries, args):
 
 def difference(timeSeries, inputJson, outputJson):
     try:
-        args = Helper.buildArguments(inputJson, ["difference_level", Constants.FREQUENCY_TYPE_KEY])
+        args = Helper.buildArguments(inputJson, ["difference_level", Constants.PYTHON_FREQUENCY_TYPE_KEY])
 
         elementsCount = timeSeries.count()
         differencesCount = args["difference_level"]
@@ -68,7 +68,7 @@ def difference(timeSeries, inputJson, outputJson):
 
 def logarithm(timeSeries, inputJson, outputJson):
     try:
-        args = Helper.buildArguments(inputJson, ["use_natural_log", "base", Constants.FREQUENCY_TYPE_KEY])
+        args = Helper.buildArguments(inputJson, ["use_natural_log", "base", Constants.PYTHON_FREQUENCY_TYPE_KEY])
 
         if (timeSeries <= 0).any():
             outputJson[Constants.OUT_EXCEPTION_KEY] = {
@@ -106,7 +106,7 @@ def normalization(timeSeries, inputJson, outputJson):
         return (value - pTimeSeriesMin) / (pTimeSeriesMax - pTimeSeriesMin) * (pMax - pMin) + pMin
 
     try:
-        args = Helper.buildArguments(inputJson, ["min", "max", Constants.FREQUENCY_TYPE_KEY])
+        args = Helper.buildArguments(inputJson, ["min", "max", Constants.PYTHON_FREQUENCY_TYPE_KEY])
 
         timeSeriesMin = min(timeSeries.values)
         timeSeriesMax = max(timeSeries.values)
@@ -140,7 +140,7 @@ def standardization(timeSeries, inputJson, outputJson):
         return (value - pTimeSeriesMean) / pTimeSeriesStandardDeviation * pStandardDeviation + pMean
 
     try:
-        args = Helper.buildArguments(inputJson, ["mean", "standard_deviation", Constants.FREQUENCY_TYPE_KEY])
+        args = Helper.buildArguments(inputJson, ["mean", "standard_deviation", Constants.PYTHON_FREQUENCY_TYPE_KEY])
 
         timeSeriesMean = np.mean(timeSeries)
         timeSeriesStandardDeviation = np.std(timeSeries)
