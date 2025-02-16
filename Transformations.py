@@ -102,7 +102,38 @@ def logarithm(timeSeries, inputJson, outputJson):
     return True
 
 def normalization(timeSeries, inputJson, outputJson):
-    return
+    def normalize(value, pTimeSeriesMin, pTimeSeriesMax, pMin, pMax):
+        return (value - pTimeSeriesMin) / (pTimeSeriesMax - pTimeSeriesMin) * (pMax - pMin) + pMin
+
+    try:
+        args = Helper.buildArguments(inputJson, ["min", "max", Constants.FREQUENCY_TYPE_KEY])
+
+        timeSeriesMin = min(timeSeries.values)
+        timeSeriesMax = max(timeSeries.values)
+
+        timeSeriesNormalized = [
+            normalize(element, timeSeriesMin, timeSeriesMax, args["min"], args["max"])
+            for element in timeSeries
+        ]
+        timeSeriesNormalized = pd.Series(timeSeriesNormalized, index = timeSeries.index)
+
+        fileName, timeSeriesStart = processResult(timeSeriesNormalized, args)
+        outputJson[Constants.OUTPUT_TRANSFORMED_FILE_NAME_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_TRANSFORMED_FILE_NAME_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: fileName
+        }
+        outputJson[Constants.OUTPUT_START_DATE_TIME_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_START_DATE_TIME_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.formatDate(timeSeriesStart)
+        }
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
 
 def standardization(timeSeries, inputJson, outputJson):
     return
