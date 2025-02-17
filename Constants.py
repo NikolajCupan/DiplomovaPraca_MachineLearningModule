@@ -53,6 +53,7 @@ OUT_EXCEPTION_TITLE_VALUE = "vzniknutá chyba"
 
 PYTHON_FREQUENCY_TYPE_KEY = "python_frequency"
 FREQUENCY_TYPE_KEY = "frequency"
+FORECAST_COUNT_KEY = "forecast_count"
 
 
 OUTPUT_TRANSFORMED_FILE_NAME_KEY = "transformed_file_name"
@@ -88,6 +89,7 @@ OUTPUT_SUMMARY_KEY = "summary"
 
 OUTPUT_TRAIN_KEY = "train"
 OUTPUT_TEST_KEY = "test"
+OUTPUT_FORECAST_KEY = "forecast"
 
 MODEL_DATE_KEY = "date"
 MODEL_REAL_KEY = "real"
