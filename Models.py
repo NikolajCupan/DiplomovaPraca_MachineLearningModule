@@ -3,8 +3,27 @@ import pandas as pd
 
 import Constants
 import Helper
+import Tests
 
 from statsmodels.tsa.arima.model import ARIMA
+
+def performLjungBoxTest(inputJson, timeSeries):
+    outputJson = {}
+
+    success = Tests.ljungBoxTest(timeSeries, inputJson, outputJson)
+    Tests.evaluatePValue(inputJson, outputJson)
+
+    outputJson[Constants.OUTPUT_SUCCESS_KEY] = success
+    return outputJson
+
+def performArchTest(inputJson, timeSeries):
+    outputJson = {}
+
+    success = Tests.archTest(timeSeries, inputJson, outputJson)
+    Tests.evaluatePValue(inputJson, outputJson)
+
+    outputJson[Constants.OUTPUT_SUCCESS_KEY] = success
+    return outputJson
 
 def arima(timeSeries, inputJson, outputJson):
     try:
@@ -75,6 +94,9 @@ def arima(timeSeries, inputJson, outputJson):
                 Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(trainSet),
                 Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(trainResult.fittedvalues)
             }
+
+        outputJson["ljung_box_test"] = performLjungBoxTest(inputJson, trainSet)
+        outputJson["arch_test"] = performArchTest(inputJson, trainSet)
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,

@@ -60,35 +60,6 @@ def getTimeSeries(datasetFileName):
 
     return timeSeries
 
-def evaluatePValue(inputJson, outputJson):
-    inputPValue = -1
-    resultPValue = -1
-
-    if Constants.OUTPUT_P_VALUE_KEY in outputJson:
-        resultPValue = float(outputJson[Constants.OUTPUT_P_VALUE_KEY][Constants.OUTPUT_ELEMENT_RESULT_KEY])
-
-    if Constants.INPUT_P_VALUE_KEY in inputJson:
-        inputPValue = float(inputJson[Constants.INPUT_P_VALUE_KEY])
-
-    outputJson[Constants.OUTPUT_USED_P_VALUE_KEY] = {
-        Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_USED_P_VALUE_TITLE_VALUE,
-        Constants.OUTPUT_ELEMENT_RESULT_KEY: inputPValue
-    }
-
-    outputJson[Constants.OUTPUT_EVALUATION_KEY] = {
-        Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EVALUATION_TITLE_VALUE,
-        Constants.OUTPUT_ELEMENT_RESULT_KEY: ""
-    }
-
-    if inputPValue == -1 or resultPValue == -1:
-        outputJson[Constants.OUTPUT_EVALUATION_KEY][Constants.OUTPUT_ELEMENT_RESULT_KEY] = "p-hodnoty nebolo možné vyhodnotiť"
-        return
-
-    if resultPValue < inputPValue:
-        outputJson[Constants.OUTPUT_EVALUATION_KEY][Constants.OUTPUT_ELEMENT_RESULT_KEY] = "p-hodnota je nižšia ako zvolená hladina významnosti, zamietame nulovú hypotézu v prospech alternatívnej hypotézy"
-    else:
-        outputJson[Constants.OUTPUT_EVALUATION_KEY][Constants.OUTPUT_ELEMENT_RESULT_KEY] = "p-hodnota je rovná ale vyššia ako hladina významnosti, nezamietame nulovú hypotézu"
-
 def executeAction(jsonFileName):
     inputJsonFilePath = Helper.getFullInputPath(jsonFileName)
     outputJsonFilePath = Helper.getFullOutputPath(jsonFileName)
@@ -147,7 +118,7 @@ def executeAction(jsonFileName):
 
     outputJson[Constants.OUTPUT_SUCCESS_KEY] = success
     if success:
-        evaluatePValue(inputJson, outputJson)
+        Tests.evaluatePValue(inputJson, outputJson)
 
     outputJsonData = json.dumps(outputJson)
 
