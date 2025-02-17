@@ -26,10 +26,6 @@ def arima(timeSeries, inputJson, outputJson):
 
         trainResult = model.fit()
 
-        testFittedValues = trainResult.forecast(steps = len(testSet))
-        testResiduals = testSet.values - testFittedValues
-
-
         outputJson[Constants.FREQUENCY_TYPE_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "frekvencia",
             Constants.OUTPUT_ELEMENT_RESULT_KEY: args[Constants.FREQUENCY_TYPE_KEY]
@@ -45,20 +41,25 @@ def arima(timeSeries, inputJson, outputJson):
             Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(trainResult.fittedvalues),
             Constants.MODEL_RESIDUALS_KEY: Helper.convertToJsonArray(trainResult.resid)
         }
-        outputJson[Constants.OUTPUT_TEST_KEY] = {
-            Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(testSet.index),
-            Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(testSet),
-            Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(testFittedValues),
-            Constants.MODEL_RESIDUALS_KEY: Helper.convertToJsonArray(testResiduals)
-        }
 
 
-        if args[Constants.FORECAST_COUNT_KEY] != 0:
-            forecast = trainResult.forecast(
+        if len(testSet) > 0:
+            testFittedValues = trainResult.forecast(steps = len(testSet))
+            testResiduals = testSet.values - testFittedValues
+
+            outputJson[Constants.OUTPUT_TEST_KEY] = {
+                Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(testSet.index),
+                Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(testSet),
+                Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(testFittedValues),
+                Constants.MODEL_RESIDUALS_KEY: Helper.convertToJsonArray(testResiduals)
+            }
+
+
+        if len(testSet) + args[Constants.FORECAST_COUNT_KEY] > 0:
+            allForecast = trainResult.forecast(
                 steps = len(testSet) + args[Constants.FORECAST_COUNT_KEY]
             )
-
-            allFittedValues = np.concatenate((trainResult.fittedvalues, forecast), axis = 0)
+            allFittedValues = np.concatenate((trainResult.fittedvalues, allForecast), axis = 0)
             allIndex = pd.date_range(
                 start = timeSeries.index[0], periods = len(allFittedValues), freq = args[Constants.PYTHON_FREQUENCY_TYPE_KEY]
             )
@@ -68,20 +69,12 @@ def arima(timeSeries, inputJson, outputJson):
                 Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(timeSeries),
                 Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(allFittedValues)
             }
-
-        # print(result.summary())
-        #
-        # fitted_values = result.fittedvalues
-        # forecast = result.forecast(steps=len(testSet))
-        # forecast = result.forecast(steps=20)
-        #
-        # plt.plot(timeSeries.index, timeSeries.values, label='Real')
-        # plt.plot(trainSet.index, fitted_values, label='Fitted', linestyle='--')
-        # plt.plot(testSet.index, forecast, label='Forecast', linestyle='--', color='red')
-        # plt.plot(pd.date_range(testSet.index[-1], periods=21, freq='MS')[1:], forecast, label='Future Forecast',
-        #          linestyle='--', color='green')
-        # plt.legend()
-        # plt.show()
+        else:
+            outputJson[Constants.OUTPUT_FORECAST_KEY] = {
+                Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(trainSet.index),
+                Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(trainSet),
+                Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(trainResult.fittedvalues)
+            }
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
