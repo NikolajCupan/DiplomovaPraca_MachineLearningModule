@@ -6,9 +6,10 @@ import numpy as np
 import pandas as pd
 
 from math import sqrt
-
-from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 def performLjungBoxTest(inputJson, timeSeries):
     outputJson = {}
@@ -40,6 +41,58 @@ def getAccuracy(real, fitted):
     }
     return outputJson
 
+def processModelResult(args, timeSeries, trainSet, testSet, trainResult, outputJson):
+    outputJson["train_accuracy"] = getAccuracy(trainSet.values, trainResult.fittedvalues)
+
+    outputJson[Constants.FREQUENCY_TYPE_KEY] = {
+        Constants.OUTPUT_ELEMENT_TITLE_KEY: "frekvencia",
+        Constants.OUTPUT_ELEMENT_RESULT_KEY: args[Constants.FREQUENCY_TYPE_KEY]
+    }
+    outputJson[Constants.OUTPUT_SUMMARY_KEY] = {
+        Constants.OUTPUT_ELEMENT_TITLE_KEY: "výsledok",
+        Constants.OUTPUT_ELEMENT_RESULT_KEY: str(trainResult.summary())
+    }
+
+    outputJson[Constants.OUTPUT_TRAIN_KEY] = {
+        Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(trainSet.index),
+        Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(trainSet),
+        Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(trainResult.fittedvalues),
+        Constants.MODEL_RESIDUALS_KEY: Helper.convertToJsonArray(trainResult.resid)
+    }
+
+    if len(testSet) > 0:
+        testFittedValues = trainResult.forecast(steps=len(testSet))
+        testResiduals = testSet.values - testFittedValues
+
+        outputJson[Constants.OUTPUT_TEST_KEY] = {
+            Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(testSet.index),
+            Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(testSet),
+            Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(testFittedValues),
+            Constants.MODEL_RESIDUALS_KEY: Helper.convertToJsonArray(testResiduals)
+        }
+        outputJson["test_accuracy"] = getAccuracy(testSet.values, testFittedValues)
+
+    if len(testSet) + args[Constants.FORECAST_COUNT_KEY] > 0:
+        allForecast = trainResult.forecast(
+            steps=len(testSet) + args[Constants.FORECAST_COUNT_KEY]
+        )
+        allFittedValues = np.concatenate((trainResult.fittedvalues, allForecast), axis=0)
+        allIndex = pd.date_range(
+            start=timeSeries.index[0], periods=len(allFittedValues), freq=args[Constants.PYTHON_FREQUENCY_TYPE_KEY]
+        )
+
+        outputJson[Constants.OUTPUT_FORECAST_KEY] = {
+            Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(allIndex),
+            Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(timeSeries),
+            Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(allFittedValues)
+        }
+    else:
+        outputJson[Constants.OUTPUT_FORECAST_KEY] = {
+            Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(trainSet.index),
+            Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(trainSet),
+            Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(trainResult.fittedvalues)
+        }
+
 def arima(timeSeries, inputJson, outputJson):
     try:
         args = Helper.buildArguments(inputJson, [
@@ -52,68 +105,50 @@ def arima(timeSeries, inputJson, outputJson):
         trainSize = int(len(timeSeries) * (args["train_percent"] / 100))
         trainSet, testSet = timeSeries[:trainSize], timeSeries[trainSize:]
 
-        model = SARIMAX(
+        model = ARIMA(
             trainSet.values,
             order = (args["normal_p"], args["normal_d"], args["normal_q"]),
             seasonal_order = (args["seasonal_p"], args["seasonal_d"], args["seasonal_q"], args["season_length"])
         )
 
         trainResult = model.fit()
-        outputJson["train_accuracy"] = getAccuracy(trainSet.values, trainResult.fittedvalues)
-
-        outputJson[Constants.FREQUENCY_TYPE_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: "frekvencia",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: args[Constants.FREQUENCY_TYPE_KEY]
-        }
-        outputJson[Constants.OUTPUT_SUMMARY_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: "výsledok",
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(trainResult.summary())
-        }
-
-        outputJson[Constants.OUTPUT_TRAIN_KEY] = {
-            Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(trainSet.index),
-            Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(trainSet),
-            Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(trainResult.fittedvalues),
-            Constants.MODEL_RESIDUALS_KEY: Helper.convertToJsonArray(trainResult.resid)
-        }
-
-
-        if len(testSet) > 0:
-            testFittedValues = trainResult.forecast(steps = len(testSet))
-            testResiduals = testSet.values - testFittedValues
-
-            outputJson[Constants.OUTPUT_TEST_KEY] = {
-                Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(testSet.index),
-                Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(testSet),
-                Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(testFittedValues),
-                Constants.MODEL_RESIDUALS_KEY: Helper.convertToJsonArray(testResiduals)
-            }
-            outputJson["test_accuracy"] = getAccuracy(testSet.values, testFittedValues)
-
-
-        if len(testSet) + args[Constants.FORECAST_COUNT_KEY] > 0:
-            allForecast = trainResult.forecast(
-                steps = len(testSet) + args[Constants.FORECAST_COUNT_KEY]
-            )
-            allFittedValues = np.concatenate((trainResult.fittedvalues, allForecast), axis = 0)
-            allIndex = pd.date_range(
-                start = timeSeries.index[0], periods = len(allFittedValues), freq = args[Constants.PYTHON_FREQUENCY_TYPE_KEY]
-            )
-
-            outputJson[Constants.OUTPUT_FORECAST_KEY] = {
-                Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(allIndex),
-                Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(timeSeries),
-                Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(allFittedValues)
-            }
-        else:
-            outputJson[Constants.OUTPUT_FORECAST_KEY] = {
-                Constants.MODEL_DATE_KEY: Helper.convertToJsonDatesArray(trainSet.index),
-                Constants.MODEL_REAL_KEY: Helper.convertToJsonArray(trainSet),
-                Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(trainResult.fittedvalues)
-            }
+        processModelResult(args, timeSeries, trainSet, testSet, trainResult, outputJson)
 
         outputJson["ljung_box_test"] = performLjungBoxTest(inputJson, trainSet)
         outputJson["arch_test"] = performArchTest(inputJson, trainSet)
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
+
+def holtWinter(timeSeries, inputJson, outputJson):
+    try:
+        args = Helper.buildArguments(inputJson, [
+            Constants.PYTHON_FREQUENCY_TYPE_KEY,
+            Constants.FREQUENCY_TYPE_KEY,
+            "train_percent", "forecast_count"
+        ])
+
+        trainSize = int(len(timeSeries) * (args["train_percent"] / 100))
+        trainSet, testSet = timeSeries[:trainSize], timeSeries[trainSize:]
+
+        model = ExponentialSmoothing(
+            timeSeries,
+            trend = 'add',
+            seasonal = 'add',
+            seasonal_periods = 12
+        )
+
+        trainResult = model.fit(
+            smoothing_level = 0.5,
+            smoothing_trend = 0.33333,
+            smoothing_seasonal = 0.033333
+        )
+        processModelResult(args, timeSeries, trainSet, testSet, trainResult, outputJson)
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,

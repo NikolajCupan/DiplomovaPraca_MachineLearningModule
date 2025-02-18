@@ -34,6 +34,7 @@ ACTION_NORMALIZATION = "normalization"
 ACTION_STANDARDIZATION = "standardization"
 
 ACTION_ARIMA = "arima"
+ACTION_HOLT_WINTER = "holt_winter"
 
 
 INPUT_FILE_NAME_KEY = "file_name"
@@ -95,4 +96,3 @@ MODEL_DATE_KEY = "date"
 MODEL_REAL_KEY = "real"
 MODEL_FITTED_KEY = "fitted"
 MODEL_RESIDUALS_KEY = "residuals"
-MODEL_FORECAST_KEY = "forecast"

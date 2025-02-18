@@ -107,6 +107,8 @@ def executeAction(jsonFileName):
         # Models
         elif action == Constants.ACTION_ARIMA:
             success = Models.arima(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_HOLT_WINTER:
+            success = Models.holtWinter(timeSeries, inputJson, outputJson)
         # Models End
         #
         #
@@ -135,7 +137,7 @@ def executeAction(jsonFileName):
 
 if __name__ == "__main__":
     if Constants.DEBUG:
-        Debug.debug3()
+        Debug.debug()
         sys.exit(0)
 
     sys.stdout.reconfigure(encoding = 'utf-8')
