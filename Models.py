@@ -1,11 +1,14 @@
-import numpy as np
-import pandas as pd
-
 import Constants
 import Helper
 import Tests
 
-from statsmodels.tsa.arima.model import ARIMA
+import numpy as np
+import pandas as pd
+
+from math import sqrt
+
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 def performLjungBoxTest(inputJson, timeSeries):
     outputJson = {}
@@ -25,6 +28,18 @@ def performArchTest(inputJson, timeSeries):
     outputJson[Constants.OUTPUT_SUCCESS_KEY] = success
     return outputJson
 
+def getAccuracy(real, fitted):
+    if len(real) != len(fitted):
+        return {}
+
+    outputJson = {
+        "mse": mean_squared_error(real, fitted),
+        "rmse": sqrt(mean_squared_error(real, fitted)),
+        "mae": mean_absolute_error(real, fitted),
+        "r2": r2_score(real, fitted)
+    }
+    return outputJson
+
 def arima(timeSeries, inputJson, outputJson):
     try:
         args = Helper.buildArguments(inputJson, [
@@ -37,13 +52,14 @@ def arima(timeSeries, inputJson, outputJson):
         trainSize = int(len(timeSeries) * (args["train_percent"] / 100))
         trainSet, testSet = timeSeries[:trainSize], timeSeries[trainSize:]
 
-        model = ARIMA(
+        model = SARIMAX(
             trainSet.values,
             order = (args["normal_p"], args["normal_d"], args["normal_q"]),
             seasonal_order = (args["seasonal_p"], args["seasonal_d"], args["seasonal_q"], args["season_length"])
         )
 
         trainResult = model.fit()
+        outputJson["train_accuracy"] = getAccuracy(trainSet.values, trainResult.fittedvalues)
 
         outputJson[Constants.FREQUENCY_TYPE_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "frekvencia",
@@ -72,6 +88,7 @@ def arima(timeSeries, inputJson, outputJson):
                 Constants.MODEL_FITTED_KEY: Helper.convertToJsonArray(testFittedValues),
                 Constants.MODEL_RESIDUALS_KEY: Helper.convertToJsonArray(testResiduals)
             }
+            outputJson["test_accuracy"] = getAccuracy(testSet.values, testFittedValues)
 
 
         if len(testSet) + args[Constants.FORECAST_COUNT_KEY] > 0:
