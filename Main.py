@@ -109,6 +109,8 @@ def executeAction(jsonFileName):
             success = Models.arima(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_SIMPLE_EXP_SMOOTHING:
             success = Models.simpleExpSmoothing(timeSeries, inputJson, outputJson)
+        elif action == Constants.ACTION_DOUBLE_EXP_SMOOTHING:
+            success = Models.doubleExpSmoothing(timeSeries, inputJson, outputJson)
         elif action == Constants.ACTION_HOLT_WINTER:
             success = Models.holtWinter(timeSeries, inputJson, outputJson)
         # Models End
