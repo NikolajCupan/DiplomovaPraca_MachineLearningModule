@@ -6,12 +6,13 @@ import numpy as np
 import pandas as pd
 
 from math import sqrt
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.api import SimpleExpSmoothing
 from statsmodels.tsa.api import Holt
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
+
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 def performLjungBoxTest(inputJson, timeSeries):
     outputJson = {}

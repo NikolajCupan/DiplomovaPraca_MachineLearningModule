@@ -9,57 +9,6 @@ import Transformations
 import sys
 import json
 
-import pandas as pd
-
-def formatJson(pJson):
-    jsonData = json.dumps(pJson, ensure_ascii = False, indent = 4)
-    formattedJsonData = ""
-
-    inString = False
-    inArray = False
-    escape = False
-
-    for i in range(len(jsonData)):
-        char = jsonData[i]
-        appendedChar = char
-
-        if inString:
-            if escape:
-                escape = False
-            elif char == '\\':
-                escape = True
-            elif char == '\"':
-                inString = False
-        else:
-            if char == '\"':
-                inString = True
-            elif char == '[':
-                inArray = True
-            elif char == ']':
-                inArray = False
-            elif char == '\n' and inArray:
-                appendedChar = ''
-            elif char == ' ' and inArray:
-                appendedChar = ''
-            elif char == ',' and inArray:
-                appendedChar = ", "
-
-        formattedJsonData += appendedChar
-
-    return formattedJsonData
-
-def getTimeSeries(datasetFileName):
-    timeSeriesPath = Helper.getFullTimeSeriesPath(datasetFileName + ".csv")
-    dataset = pd.read_csv(str(timeSeriesPath), header = None, names = [Constants.DATE_COLUMN_NAME, Constants.DATA_COLUMN_NAME])
-    dataset[Constants.DATE_COLUMN_NAME] = pd.to_datetime(dataset[Constants.DATE_COLUMN_NAME], format = Constants.DATE_TIME_FORMAT, errors = "coerce")
-
-    timeSeries = pd.Series(dataset[Constants.DATA_COLUMN_NAME].values, index=dataset[Constants.DATE_COLUMN_NAME])
-    timeSeries = timeSeries.dropna()
-    timeSeries = timeSeries[timeSeries != "-"]
-    timeSeries = pd.to_numeric(timeSeries, errors = "coerce").dropna()
-
-    return timeSeries
-
 def executeAction(jsonFileName):
     inputJsonFilePath = Helper.getFullInputPath(jsonFileName)
     outputJsonFilePath = Helper.getFullOutputPath(jsonFileName)
@@ -69,7 +18,7 @@ def executeAction(jsonFileName):
     with open(inputJsonFilePath) as inputFile:
         inputJson = json.load(inputFile)
         action = inputJson[Constants.INPUT_ACTION_KEY]
-        timeSeries = getTimeSeries(inputJson[Constants.INPUT_FILE_NAME_KEY])
+        timeSeries = Helper.getTimeSeries(inputJson[Constants.INPUT_FILE_NAME_KEY])
 
         #
         # Debug
@@ -138,11 +87,11 @@ def executeAction(jsonFileName):
         outputFile.write(outputJsonData)
 
     print("\n============================================================ INPUT JSON ============================================================")
-    print(formatJson(inputJson))
+    print(Helper.formatJson(inputJson))
     print("========================================================== INPUT JSON END ==========================================================")
 
     print("\n=========================================================== OUTPUT JSON ============================================================")
-    print(formatJson(outputJson))
+    print(Helper.formatJson(outputJson))
     print("========================================================== OUTPUT JSON END ==========================================================")
 
 if __name__ == "__main__":
@@ -153,7 +102,7 @@ if __name__ == "__main__":
         if len(sys.argv) > 1:
             fileName = sys.argv[1]
         else:
-            fileName = "debug.json"
+            fileName = Constants.DEBUG_FILE_NAME
 
         executeAction(fileName)
     except Exception as exception:
