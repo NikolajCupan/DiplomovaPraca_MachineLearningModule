@@ -2,4 +2,3 @@ java_backend
 .venv/
 .idea/
 data/
-debug.py
