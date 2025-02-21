@@ -9,6 +9,7 @@ from math import sqrt
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.api import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 def performLjungBoxTest(inputJson, timeSeries):
@@ -109,6 +110,28 @@ def arima(timeSeries, inputJson, outputJson):
 
         outputJson["ljung_box_test"] = performLjungBoxTest(inputJson, trainSet)
         outputJson["arch_test"] = performArchTest(inputJson, trainSet)
+    except Exception as exception:
+        outputJson[Constants.OUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
+        }
+        return False
+
+    return True
+
+def simpleExpSmoothing(timeSeries, inputJson, outputJson):
+    try:
+        trainSize = int(len(timeSeries) * (inputJson["train_percent"] / 100))
+        trainSet, testSet = timeSeries[:trainSize], timeSeries[trainSize:]
+
+        model = SimpleExpSmoothing(
+            trainSet.values
+        )
+
+        trainResult = model.fit(
+            smoothing_level = inputJson["alpha"]
+        )
+        processModelResult(inputJson, timeSeries, trainSet, testSet, trainResult, outputJson)
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,

@@ -34,6 +34,7 @@ ACTION_NORMALIZATION = "normalization"
 ACTION_STANDARDIZATION = "standardization"
 
 ACTION_ARIMA = "arima"
+ACTION_SIMPLE_EXP_SMOOTHING = "simple_exp_smoothing"
 ACTION_HOLT_WINTER = "holt_winter"
 
 
