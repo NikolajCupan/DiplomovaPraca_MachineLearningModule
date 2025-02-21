@@ -21,7 +21,7 @@ def saveToFile(timeSeries):
 def processResult(timeSeries, args):
     timeSeriesStart = timeSeries.index.min()
     timeSeriesEnd = timeSeries.index.max()
-    timeSeriesFrequency = args[Constants.PYTHON_FREQUENCY_TYPE_KEY]
+    timeSeriesFrequency = args[Constants.INPUT_PYTHON_FREQUENCY_TYPE_KEY]
 
     fullDatesRange = pd.date_range(start = timeSeriesStart, end = timeSeriesEnd, freq = timeSeriesFrequency)
     timeSeries = timeSeries.reindex(fullDatesRange, fill_value = "-")
@@ -31,14 +31,14 @@ def processResult(timeSeries, args):
 
 def difference(timeSeries, inputJson, outputJson):
     try:
-        args = Helper.buildArguments(inputJson, ["difference_level", Constants.PYTHON_FREQUENCY_TYPE_KEY])
+        args = Helper.buildArguments(inputJson, ["difference_level", Constants.INPUT_PYTHON_FREQUENCY_TYPE_KEY])
 
         elementsCount = timeSeries.count()
         differencesCount = args["difference_level"]
 
         if elementsCount - differencesCount < 10:
-            outputJson[Constants.OUT_EXCEPTION_KEY] = {
-                Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+                Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
                 Constants.OUTPUT_ELEMENT_RESULT_KEY: "Po vykonaní diferencie by dataset obsahoval menej ako 10 pozorovaní"
             }
             return False
@@ -58,8 +58,8 @@ def difference(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.formatDate(timeSeriesDifferenceStart)
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
@@ -68,11 +68,11 @@ def difference(timeSeries, inputJson, outputJson):
 
 def logarithm(timeSeries, inputJson, outputJson):
     try:
-        args = Helper.buildArguments(inputJson, ["use_natural_log", "base", Constants.PYTHON_FREQUENCY_TYPE_KEY])
+        args = Helper.buildArguments(inputJson, ["use_natural_log", "base", Constants.INPUT_PYTHON_FREQUENCY_TYPE_KEY])
 
         if (timeSeries <= 0).any():
-            outputJson[Constants.OUT_EXCEPTION_KEY] = {
-                Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+            outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+                Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
                 Constants.OUTPUT_ELEMENT_RESULT_KEY: "Dataset obsahuje záporné hodnoty"
             }
             return False
@@ -93,8 +93,8 @@ def logarithm(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.formatDate(timeSeriesStart)
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
@@ -106,7 +106,7 @@ def normalization(timeSeries, inputJson, outputJson):
         return (value - pTimeSeriesMin) / (pTimeSeriesMax - pTimeSeriesMin) * (pMax - pMin) + pMin
 
     try:
-        args = Helper.buildArguments(inputJson, ["min", "max", Constants.PYTHON_FREQUENCY_TYPE_KEY])
+        args = Helper.buildArguments(inputJson, ["min", "max", Constants.INPUT_PYTHON_FREQUENCY_TYPE_KEY])
 
         timeSeriesMin = min(timeSeries.values)
         timeSeriesMax = max(timeSeries.values)
@@ -127,8 +127,8 @@ def normalization(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.formatDate(timeSeriesStart)
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
@@ -140,7 +140,7 @@ def standardization(timeSeries, inputJson, outputJson):
         return (value - pTimeSeriesMean) / pTimeSeriesStandardDeviation * pStandardDeviation + pMean
 
     try:
-        args = Helper.buildArguments(inputJson, ["mean", "standard_deviation", Constants.PYTHON_FREQUENCY_TYPE_KEY])
+        args = Helper.buildArguments(inputJson, ["mean", "standard_deviation", Constants.INPUT_PYTHON_FREQUENCY_TYPE_KEY])
 
         timeSeriesMean = np.mean(timeSeries)
         timeSeriesStandardDeviation = np.std(timeSeries)
@@ -161,8 +161,8 @@ def standardization(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.formatDate(timeSeriesStart)
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False

@@ -72,6 +72,12 @@ def executeAction(jsonFileName):
         timeSeries = getTimeSeries(inputJson[Constants.INPUT_FILE_NAME_KEY])
 
         #
+        # Debug
+        if action == Constants.ACTION_DEBUG:
+            Debug.debug()
+        # Debug end
+        #
+        #
         # Tests
         if action == Constants.ACTION_DICKEY_FULLER_TEST:
             success = Tests.dickeyFullerTest(timeSeries, inputJson, outputJson)
@@ -140,10 +146,6 @@ def executeAction(jsonFileName):
     print("========================================================== OUTPUT JSON END ==========================================================")
 
 if __name__ == "__main__":
-    if Constants.DEBUG:
-        Debug.debug()
-        sys.exit(0)
-
     sys.stdout.reconfigure(encoding = 'utf-8')
 
     try:

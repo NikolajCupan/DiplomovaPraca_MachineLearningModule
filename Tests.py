@@ -79,8 +79,8 @@ def dickeyFullerTest(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: "časový rad je stacionárny"
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
@@ -119,8 +119,8 @@ def kpssTest(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: "časový rad nie je trendovo stacionárny"
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
@@ -149,8 +149,8 @@ def seasonalDecompose(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(result.resid)
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
@@ -183,8 +183,8 @@ def periodogram(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(period)
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
@@ -210,8 +210,8 @@ def correlogramAcf(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(confintResultLowerBound)
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
@@ -237,8 +237,8 @@ def correlogramPacf(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(confintResultLowerBound)
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
@@ -277,8 +277,8 @@ def archTest(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: "reziduá vykazujú známky heteroskedasticity"
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
@@ -318,8 +318,8 @@ def ljungBoxTest(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: "reziduá nie sú nezávisle rozdelené, vykazujú sériovú koreláciu"
         }
     except Exception as exception:
-        outputJson[Constants.OUT_EXCEPTION_KEY] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
+        outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_EXCEPTION_TITLE_VALUE,
             Constants.OUTPUT_ELEMENT_RESULT_KEY: str(exception)
         }
         return False
