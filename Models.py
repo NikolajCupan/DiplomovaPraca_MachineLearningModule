@@ -41,12 +41,12 @@ def getAccuracy(real, fitted):
     }
     return outputJson
 
-def processModelResult(args, timeSeries, trainSet, testSet, trainResult, outputJson):
+def processModelResult(inputJson, timeSeries, trainSet, testSet, trainResult, outputJson):
     outputJson["train_accuracy"] = getAccuracy(trainSet.values, trainResult.fittedvalues)
 
     outputJson[Constants.FREQUENCY_TYPE_KEY] = {
         Constants.OUTPUT_ELEMENT_TITLE_KEY: "frekvencia",
-        Constants.OUTPUT_ELEMENT_RESULT_KEY: args[Constants.FREQUENCY_TYPE_KEY]
+        Constants.OUTPUT_ELEMENT_RESULT_KEY: inputJson[Constants.FREQUENCY_TYPE_KEY]
     }
     outputJson[Constants.OUTPUT_SUMMARY_KEY] = {
         Constants.OUTPUT_ELEMENT_TITLE_KEY: "výsledok",
@@ -61,7 +61,7 @@ def processModelResult(args, timeSeries, trainSet, testSet, trainResult, outputJ
     }
 
     if len(testSet) > 0:
-        testFittedValues = trainResult.forecast(steps=len(testSet))
+        testFittedValues = trainResult.forecast(steps = len(testSet))
         testResiduals = testSet.values - testFittedValues
 
         outputJson[Constants.OUTPUT_TEST_KEY] = {
@@ -72,13 +72,13 @@ def processModelResult(args, timeSeries, trainSet, testSet, trainResult, outputJ
         }
         outputJson["test_accuracy"] = getAccuracy(testSet.values, testFittedValues)
 
-    if len(testSet) + args[Constants.FORECAST_COUNT_KEY] > 0:
+    if len(testSet) + inputJson[Constants.FORECAST_COUNT_KEY] > 0:
         allForecast = trainResult.forecast(
-            steps=len(testSet) + args[Constants.FORECAST_COUNT_KEY]
+            steps = len(testSet) + inputJson[Constants.FORECAST_COUNT_KEY]
         )
-        allFittedValues = np.concatenate((trainResult.fittedvalues, allForecast), axis=0)
+        allFittedValues = np.concatenate((trainResult.fittedvalues, allForecast), axis = 0)
         allIndex = pd.date_range(
-            start=timeSeries.index[0], periods=len(allFittedValues), freq=args[Constants.PYTHON_FREQUENCY_TYPE_KEY]
+            start = timeSeries.index[0], periods = len(allFittedValues), freq = inputJson[Constants.PYTHON_FREQUENCY_TYPE_KEY]
         )
 
         outputJson[Constants.OUTPUT_FORECAST_KEY] = {
@@ -95,24 +95,17 @@ def processModelResult(args, timeSeries, trainSet, testSet, trainResult, outputJ
 
 def arima(timeSeries, inputJson, outputJson):
     try:
-        args = Helper.buildArguments(inputJson, [
-            Constants.PYTHON_FREQUENCY_TYPE_KEY,
-            Constants.FREQUENCY_TYPE_KEY,
-            "train_percent", "season_length", "normal_p", "normal_d", "normal_q", "seasonal_p", "seasonal_q", "seasonal_d",
-            Constants.FORECAST_COUNT_KEY
-        ])
-
-        trainSize = int(len(timeSeries) * (args["train_percent"] / 100))
+        trainSize = int(len(timeSeries) * (inputJson["train_percent"] / 100))
         trainSet, testSet = timeSeries[:trainSize], timeSeries[trainSize:]
 
         model = ARIMA(
             trainSet.values,
-            order = (args["normal_p"], args["normal_d"], args["normal_q"]),
-            seasonal_order = (args["seasonal_p"], args["seasonal_d"], args["seasonal_q"], args["season_length"])
+            order = (inputJson["normal_p"], inputJson["normal_d"], inputJson["normal_q"]),
+            seasonal_order = (inputJson["seasonal_p"], inputJson["seasonal_d"], inputJson["seasonal_q"], inputJson["season_length"])
         )
 
         trainResult = model.fit()
-        processModelResult(args, timeSeries, trainSet, testSet, trainResult, outputJson)
+        processModelResult(inputJson, timeSeries, trainSet, testSet, trainResult, outputJson)
 
         outputJson["ljung_box_test"] = performLjungBoxTest(inputJson, trainSet)
         outputJson["arch_test"] = performArchTest(inputJson, trainSet)
@@ -127,28 +120,22 @@ def arima(timeSeries, inputJson, outputJson):
 
 def holtWinter(timeSeries, inputJson, outputJson):
     try:
-        args = Helper.buildArguments(inputJson, [
-            Constants.PYTHON_FREQUENCY_TYPE_KEY,
-            Constants.FREQUENCY_TYPE_KEY,
-            "train_percent", "forecast_count"
-        ])
-
-        trainSize = int(len(timeSeries) * (args["train_percent"] / 100))
+        trainSize = int(len(timeSeries) * (inputJson["train_percent"] / 100))
         trainSet, testSet = timeSeries[:trainSize], timeSeries[trainSize:]
 
         model = ExponentialSmoothing(
-            timeSeries,
-            trend = 'add',
-            seasonal = 'add',
-            seasonal_periods = 12
+            trainSet.values,
+            trend = inputJson["trend_type"],
+            seasonal = inputJson["season_type"],
+            seasonal_periods = inputJson["season_length"],
         )
 
         trainResult = model.fit(
-            smoothing_level = 0.5,
-            smoothing_trend = 0.33333,
-            smoothing_seasonal = 0.033333
+            smoothing_level = inputJson["alpha"],
+            smoothing_trend = inputJson["beta"],
+            smoothing_seasonal = inputJson["gamma"]
         )
-        processModelResult(args, timeSeries, trainSet, testSet, trainResult, outputJson)
+        processModelResult(inputJson, timeSeries, trainSet, testSet, trainResult, outputJson)
     except Exception as exception:
         outputJson[Constants.OUT_EXCEPTION_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUT_EXCEPTION_TITLE_VALUE,
