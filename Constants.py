@@ -24,7 +24,7 @@ DATE_TIME_FORMAT = "%Y/%m/%d-%H"
 #
 # Directories
 PYTHON_BACKEND_BASE_DIRECTORY_PATH = os.path.dirname(os.path.realpath(__file__))
-JAVA_BACKEND_BASE_DIRECTORY_NAME = "java_backend"
+JAVA_BACKEND_BASE_DIRECTORY_NAME = "website_backend"
 
 DATASET_TIME_SERIES_PATH = "storage\\dataset"
 DATASET_INPUT_PATH = "storage\\python\\input"
