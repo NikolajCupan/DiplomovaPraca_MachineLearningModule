@@ -23,7 +23,7 @@ def executeAction(jsonFileName):
         #
         # Debug
         if action == Constants.ACTION_DEBUG:
-            Debug.debug()
+            Debug.debug(timeSeries, inputJson, outputJson)
         # Debug end
         #
         #

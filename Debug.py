@@ -1,2 +1,2 @@
-def debug():
-    print("debug")
+def debug(timeSeries, inputJson, outputJson):
+    return
