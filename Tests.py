@@ -195,7 +195,9 @@ def correlogramAcf(timeSeries, inputJson, outputJson):
     try:
         args = Helper.buildArguments(inputJson, ["adjusted", "nlags", "fft", "alpha", "bartlett_confint"])
         acfResult, confintResult = acf(timeSeries.values, **args)
-        confintResultLowerBound, confintResultUpperBound = confintResult[:, 0], confintResult[:, 1]
+
+        confintResultLowerBound = confintResult[1:, 0] - acfResult[1:]
+        confintResultUpperBound = confintResult[1:, 1] - acfResult[1:]
 
         outputJson["acf_values"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "hodnoty acf",
@@ -222,7 +224,9 @@ def correlogramPacf(timeSeries, inputJson, outputJson):
     try:
         args = Helper.buildArguments(inputJson, ["nlags", "method", "alpha"])
         pacfResult, confintResult = pacf(timeSeries.values, **args)
-        confintResultLowerBound, confintResultUpperBound = confintResult[:, 0], confintResult[:, 1]
+
+        confintResultLowerBound = confintResult[1:, 0] - pacfResult[1:]
+        confintResultUpperBound = confintResult[1:, 1] - pacfResult[1:]
 
         outputJson["pacf_values"] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: "hodnoty pacf",
