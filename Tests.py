@@ -145,7 +145,7 @@ def seasonalDecompose(timeSeries, inputJson, outputJson):
             Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(result.seasonal)
         }
         outputJson["resid"] = {
-            Constants.OUTPUT_ELEMENT_TITLE_KEY: "reziduá",
+            Constants.OUTPUT_ELEMENT_TITLE_KEY: "rezíduá",
             Constants.OUTPUT_ELEMENT_RESULT_KEY: Helper.convertToJsonArray(result.resid)
         }
     except Exception as exception:
@@ -274,11 +274,11 @@ def archTest(timeSeries, inputJson, outputJson):
 
         outputJson[Constants.OUTPUT_NULL_HYPOTHESIS_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_NULL_HYPOTHESIS_TITLE_VALUE,
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: "reziduá nevykazujú známky heteroskedasticity"
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: "rezíduá nevykazujú známky heteroskedasticity"
         }
         outputJson[Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_TITLE_VALUE,
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: "reziduá vykazujú známky heteroskedasticity"
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: "rezíduá vykazujú známky heteroskedasticity"
         }
     except Exception as exception:
         outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
@@ -315,11 +315,11 @@ def ljungBoxTest(timeSeries, inputJson, outputJson):
 
         outputJson[Constants.OUTPUT_NULL_HYPOTHESIS_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_NULL_HYPOTHESIS_TITLE_VALUE,
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: "reziduá sú nezávisle rozdelené"
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: "rezíduá sú nezávisle rozdelené"
         }
         outputJson[Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_KEY] = {
             Constants.OUTPUT_ELEMENT_TITLE_KEY: Constants.OUTPUT_ALTERNATIVE_HYPOTHESIS_TITLE_VALUE,
-            Constants.OUTPUT_ELEMENT_RESULT_KEY: "reziduá nie sú nezávisle rozdelené, vykazujú sériovú koreláciu"
+            Constants.OUTPUT_ELEMENT_RESULT_KEY: "rezíduá nie sú nezávisle rozdelené, vykazujú sériovú koreláciu"
         }
     except Exception as exception:
         outputJson[Constants.OUTPUT_EXCEPTION_KEY] = {
