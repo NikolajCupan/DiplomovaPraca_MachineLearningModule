@@ -10,7 +10,7 @@ def saveToFile(timeSeries):
     fileName = Helper.getRandomString(Constants.RANDOM_STRING_LENGTH)
     fullOutputPath = Helper.getFullOutputPath(fileName + ".csv")
 
-    with open(fullOutputPath, mode = "w", newline = "") as file:
+    with open(fullOutputPath, mode = "w", newline = "", encoding='utf-8') as file:
         writer = csv.writer(file)
 
         for date, data in timeSeries.items():

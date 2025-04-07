@@ -15,7 +15,7 @@ def executeAction(jsonFileName):
 
     outputJson = {}
 
-    with open(inputJsonFilePath) as inputFile:
+    with open(inputJsonFilePath, encoding='utf-8') as inputFile:
         inputJson = json.load(inputFile)
         action = inputJson[Constants.INPUT_ACTION_KEY]
         timeSeries = Helper.getTimeSeries(inputJson[Constants.INPUT_FILE_NAME_KEY])
@@ -83,7 +83,7 @@ def executeAction(jsonFileName):
 
     outputJsonData = json.dumps(outputJson)
 
-    with open(outputJsonFilePath, 'w') as outputFile:
+    with open(outputJsonFilePath, 'w', encoding='utf-8') as outputFile:
         outputFile.write(outputJsonData)
 
     print("\n============================================================ INPUT JSON ============================================================")
