@@ -26,9 +26,9 @@ DATE_TIME_FORMAT = "%Y/%m/%d-%H"
 PYTHON_BACKEND_BASE_DIRECTORY_PATH = os.path.dirname(os.path.realpath(__file__))
 JAVA_BACKEND_BASE_DIRECTORY_NAME = "website_backend"
 
-DATASET_TIME_SERIES_PATH = "storage\\dataset"
-DATASET_INPUT_PATH = "storage\\python\\input"
-DATASET_OUTPUT_PATH = "storage\\python\\output"
+DATASET_TIME_SERIES_PATH = os.path.join("storage", "dataset")
+DATASET_INPUT_PATH = os.path.join("storage", "python", "input")
+DATASET_OUTPUT_PATH = os.path.join("storage", "python", "output")
 # Directories end
 #
 
